@@ -235,7 +235,7 @@
 	});
 
 	// iterator of Pool*Vector
-	const pool_classes = [ godot.PoolByteArray, godot.PoolIntArray, godot.PoolRealArray, godot.PoolStringArray, godot.PoolVector2Array, godot.PoolVector3Array, godot.PoolColorArray ];
+	const pool_classes = [ godot.PoolByteArray, godot.PoolIntArray, godot.PoolRealArray, godot.PoolStringArray, godot.PackedVector2Array, godot.PackedVector3Array, godot.PoolColorArray ];
 	for (const pool_class of pool_classes) {
 		Object.defineProperty(pool_class.prototype, Symbol.iterator, {value: function iterator() {
 			let next_index = 0;

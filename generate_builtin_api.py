@@ -8,19 +8,21 @@ BUILTIN_CLASSES = [
 	'Color',
 	'Vector3',
 	'Basis',
-	'Quat',
+	'Quaternion',
 	'RID',
 	'Transform2D',
 	'Plane',
 	'AABB',
-	"Transform",
-	"PoolByteArray",
-	"PoolIntArray",
-	"PoolRealArray",
-	"PoolStringArray",
-	"PoolVector2Array",
-	"PoolVector3Array",
-	"PoolColorArray",
+	"Transform3D",
+	"PackedByteArray",
+	"PackedInt32Array",
+	"PackedInt64Array",
+	"PackedFloat32Array",
+	"PackedFloat64Array",
+	"PackedStringArray",
+	"PackedVector2Array",
+	"PackedVector3Array",
+	"PackedColorArray",
 ]
 
 MAX_CONSTRUCTOR_ARGC = {
@@ -29,19 +31,21 @@ MAX_CONSTRUCTOR_ARGC = {
 	'Color': 4,
 	'Vector3': 3,
 	'Basis': 0,
-	'Quat': 0,
+	'Quaternion': 0,
 	'RID': 0,
 	'Transform2D': 0,
 	'Plane': 0,
 	'AABB': 0,
-	"Transform": 0,
-	"PoolByteArray": 0,
-	"PoolIntArray": 0,
-	"PoolRealArray": 0,
-	"PoolStringArray": 0,
-	"PoolVector2Array": 0,
-	"PoolVector3Array": 0,
-	"PoolColorArray": 0,
+	"Transform3D": 0,
+	"PackedByteArray": 0,
+	"PackedInt32Array": 0,
+	"PackedInt64Array": 0,
+	"PackedFloat32Array": 0,
+	"PackedFloat64Array": 0,
+	"PackedStringArray": 0,
+	"PackedVector2Array": 0,
+	"PackedVector3Array": 0,
+	"PackedColorArray": 0,
 }
 
 TYPE_MAP = {
@@ -203,7 +207,7 @@ METHOD_OP_LESS_EQAUL = {
 	"return": "boolean"
 }
 
-METHOD_POOL_ARRAY_GET = {
+METHOD_PACKED_ARRAY_GET = {
 	"arguments": [
 		{
 			"default_value": None,
@@ -217,26 +221,27 @@ METHOD_POOL_ARRAY_GET = {
 }
 
 IGNORED_PROPS = {
-	"Rect2": ['end', 'grow_margin'],
+	"Rect2": ['end', 'grow_side'],
 	"Color": ['h', 's', 'v', 'r8', 'g8', 'b8', 'a8'],
 	"Transform2D": ['xform', 'xform_inv'],
-	"Basis": ['is_equal_approx'],
+	"Quaternion": ['get_euler'],
+	"Basis": ['is_equal_approx', 'get_euler', 'from_euler'],
 	"Plane": ['intersects_segment', 'intersects_ray', 'intersect_3'],
 	"AABB": ['end'],
-	"Transform": ['xform', 'xform_inv'],
-	"PoolByteArray": ['compress', 'decompress', 'decompress_dynamic', 'get_string_from_ascii', 'get_string_from_utf8', 'hex_encode'],
+	"Transform3D": ['xform', 'xform_inv'],
+	"PackedByteArray": ['compress', 'decompress', 'decompress_dynamic', 'get_string_from_ascii', 'get_string_from_utf8', 'hex_encode', 'decode_s8', 'decode_s32', 'decode_s64', 'decode_double', 'decode_half', 'decode_s16', 'decode_u32'],
 }
 
 PROPERTY_REMAP = {
 	"Transform2D": {
-		"x": "elements[0]",
-		"y": "elements[1]",
-		"origin": "elements[2]",
+		"x": "columns[0]",
+		"y": "columns[1]",
+		"origin": "columns[2]",
 	},
 	"Basis": {
-		"x": "elements[0]",
-		"y": "elements[1]",
-		"z": "elements[2]",
+		"x": "rows[0]",
+		"y": "rows[1]",
+		"z": "rows[2]",
 	},
 	"Plane": {
 		"x": "normal.x",
@@ -283,7 +288,7 @@ OPERATOR_METHODS = {
 		METHOD_OP_MUL,
 		METHOD_OP_MUL_ASSIGN,
 	],
-	"Quat": [
+	"Quaternion": [
 		METHOD_OP_NEG,
 		METHOD_OP_EQUALS,
 		METHOD_OP_ADD,
@@ -324,7 +329,7 @@ OPERATOR_METHODS = {
 	"AABB": [
 		METHOD_OP_EQUALS,
 	],
-	"Transform": [
+	"Transform3D": [
 		METHOD_OP_EQUALS,
 		METHOD_OP_MUL,
 		METHOD_OP_MUL_ASSIGN,
@@ -393,8 +398,8 @@ def parse_class(cls):
 			'return': return_type,
 			'arguments': arguments,
 		})
-	if class_name.startswith("Pool") and class_name.endswith("Array"):
-		methods.append(METHOD_POOL_ARRAY_GET)
+	if class_name.startswith("Packed") and class_name.endswith("Array"):
+		methods.append(METHOD_PACKED_ARRAY_GET)
 	# add operator methods
 	if class_name in OPERATOR_METHODS:
 		for em in OPERATOR_METHODS[class_name]:

@@ -27,6 +27,12 @@
 /* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE     */
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                */
 /*************************************************************************/
+#ifndef ECMASCRIPT_REGISTER_TYPES_H
+#define ECMASCRIPT_REGISTER_TYPES_H
 
-void register_ECMAScript_types();
-void unregister_ECMAScript_types();
+#include "modules/register_module_types.h"
+
+void initialize_ECMAScript_module(ModuleInitializationLevel p_level);
+void uninitialize_ECMAScript_module(ModuleInitializationLevel p_level);
+
+#endif

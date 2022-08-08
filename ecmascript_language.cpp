@@ -1,7 +1,9 @@
 #include "ecmascript_language.h"
-#include "core/class_db.h"
-#include "core/os/file_access.h"
-ECMAScriptLanguage *ECMAScriptLanguage::singleton = NULL;
+#include "core/io/file_access.h"
+#include "core/object/class_db.h"
+#include "core/object/ref_counted.h"
+
+ECMAScriptLanguage *ECMAScriptLanguage::singleton = nullptr;
 
 void ECMAScriptLanguage::init() {
 	ERR_FAIL_NULL(main_binder);
@@ -26,7 +28,6 @@ Error ECMAScriptLanguage::execute_file(const String &p_path) {
 }
 
 void ECMAScriptLanguage::get_reserved_words(List<String> *p_words) const {
-
 	static const char *_reserved_words[] = {
 		"null",
 		"false",
@@ -143,7 +144,6 @@ void ECMAScriptLanguage::get_reserved_words(List<String> *p_words) const {
 	const char **w = _reserved_words;
 
 	while (*w) {
-
 		p_words->push_back(*w);
 		w++;
 	}
@@ -151,22 +151,21 @@ void ECMAScriptLanguage::get_reserved_words(List<String> *p_words) const {
 
 bool ECMAScriptLanguage::is_control_flow_keyword(String p_keyword) const {
 	return p_keyword == "if" ||
-		   p_keyword == "else" ||
-		   p_keyword == "return" ||
-		   p_keyword == "do" ||
-		   p_keyword == "while" ||
-		   p_keyword == "for" ||
-		   p_keyword == "break" ||
-		   p_keyword == "continue" ||
-		   p_keyword == "switch" ||
-		   p_keyword == "case" ||
-		   p_keyword == "default" ||
-		   p_keyword == "throw" ||
-		   p_keyword == "try" ||
-		   p_keyword == "catch" ||
-		   p_keyword == "finally";
+			p_keyword == "else" ||
+			p_keyword == "return" ||
+			p_keyword == "do" ||
+			p_keyword == "while" ||
+			p_keyword == "for" ||
+			p_keyword == "break" ||
+			p_keyword == "continue" ||
+			p_keyword == "switch" ||
+			p_keyword == "case" ||
+			p_keyword == "default" ||
+			p_keyword == "throw" ||
+			p_keyword == "try" ||
+			p_keyword == "catch" ||
+			p_keyword == "finally";
 }
-
 
 void ECMAScriptLanguage::get_comment_delimiters(List<String> *p_delimiters) const {
 	p_delimiters->push_back("//"); // single-line comment
@@ -180,7 +179,6 @@ void ECMAScriptLanguage::get_string_delimiters(List<String> *p_delimiters) const
 }
 
 Ref<Script> ECMAScriptLanguage::get_template(const String &p_class_name, const String &p_base_class_name) const {
-
 	String script_template = "export default class %CLASS% extends " GODOT_OBJECT_NAME ".%BASE% {\n"
 							 "    \n"
 							 "    // Declare member variables here. Examples:\n"
@@ -204,7 +202,7 @@ Ref<Script> ECMAScriptLanguage::get_template(const String &p_class_name, const S
 	script_template = script_template.replace("%BASE%", p_base_class_name).replace("%CLASS%", p_class_name);
 
 	Ref<ECMAScript> script;
-	script.instance();
+	script.instantiate();
 	script->set_source_code(script_template);
 	script->set_name(p_class_name);
 	script->set_script_path(p_class_name);
@@ -217,7 +215,7 @@ void ECMAScriptLanguage::make_template(const String &p_class_name, const String 
 	p_script->set_source_code(src);
 }
 
-bool ECMAScriptLanguage::validate(const String &p_script, int &r_line_error, int &r_col_error, String &r_test_error, const String &p_path, List<String> *r_functions, List<ScriptLanguage::Warning> *r_warnings, Set<int> *r_safe_lines) const {
+bool ECMAScriptLanguage::validate(const String &p_script, int &r_line_error, int &r_col_error, String &r_test_error, const String &p_path, List<String> *r_functions, List<ScriptLanguage::Warning> *r_warnings, HashSet<int> *r_safe_lines) const {
 	ECMAscriptScriptError script_error;
 	bool ret = main_binder->validate(p_script, p_path, &script_error);
 	if (!ret) {
@@ -234,8 +232,8 @@ Script *ECMAScriptLanguage::create_script() const {
 
 void ECMAScriptLanguage::reload_all_scripts() {
 #ifdef TOOLS_ENABLED
-	for (Set<Ref<ECMAScript> >::Element *E = scripts.front(); E; E = E->next()) {
-		reload_script(E->get(), true);
+	for (Ref<ECMAScript> elem : scripts) {
+		reload_script(elem, true);
 	}
 #endif
 }
@@ -244,7 +242,8 @@ void ECMAScriptLanguage::reload_script(const Ref<Script> &p_script, bool p_soft_
 	Ref<ECMAScript> s = p_script;
 	if (s.is_valid()) {
 		Error err = OK;
-		Ref<ECMAScriptModule> module = ResourceFormatLoaderECMAScriptModule::load_static(s->get_script_path(), "", &err);
+		Ref<Variant> placeholder = ResourceFormatLoaderECMAScriptModule::load_static(s->get_script_path(), "", &err);
+		Ref<ECMAScriptModule> module = placeholder;
 		ERR_FAIL_COND_MSG(err != OK, ("Cannot load script file '" + s->get_script_path() + "'."));
 		s->set_source_code(module->get_source_code());
 		err = s->reload(p_soft_reload);
@@ -277,13 +276,13 @@ void ECMAScriptLanguage::free_instance_binding_data(void *p_data) {
 
 void ECMAScriptLanguage::refcount_incremented_instance_binding(Object *p_object) {
 	if (ECMAScriptBinder *binder = get_thread_binder(Thread::get_caller_id())) {
-		binder->godot_refcount_incremented(static_cast<Reference *>(p_object));
+		binder->godot_refcount_incremented(static_cast<RefCounted *>(p_object));
 	}
 }
 
 bool ECMAScriptLanguage::refcount_decremented_instance_binding(Object *p_object) {
 	if (ECMAScriptBinder *binder = get_thread_binder(Thread::get_caller_id())) {
-		return binder->godot_refcount_decremented(static_cast<Reference *>(p_object));
+		return binder->godot_refcount_decremented(static_cast<RefCounted *>(p_object));
 	}
 	return true;
 }
@@ -315,14 +314,14 @@ String ECMAScriptLanguage::globalize_relative_path(const String &p_relative, con
 				break;
 			}
 		}
-		if (!base_dir.ends_with("/")) base_dir += "/";
+		if (!base_dir.ends_with("/"))
+			base_dir += "/";
 		file = base_dir + file_path;
 	}
 	return file;
 }
 
 ECMAScriptLanguage::ECMAScriptLanguage() {
-
 	ERR_FAIL_COND(singleton);
 	singleton = this;
 	main_binder = memnew(QuickJSBinder);

@@ -766,10 +766,10 @@ declare module godot {
 		/** Translates the transform by the specified offset. */
 		translated(ofs: Vector3) : Transform;
 
-		/** Transforms the given `Vector3`, `Plane`, `AABB`, or `PoolVector3Array` by this transform. */
+		/** Transforms the given `Vector3`, `Plane`, `AABB`, or `PackedVector3Array` by this transform. */
 		xform<T extends Vector3|Plane|AABB >(v: T) : T;
 
-		/** Inverse-transforms the given `Vector3`, `Plane`, `AABB`, or `PoolVector3Array` by this transform. */
+		/** Inverse-transforms the given `Vector3`, `Plane`, `AABB`, or `PackedVector3Array` by this transform. */
 		xform_inv<T extends Vector3|Plane|AABB >(v: T) : T;
 	}
 
@@ -849,10 +849,10 @@ declare module godot {
 		/** Translates the transform by the given offset. */
 		translated(offset: Vector2) : Transform2D;
 
-		/** Transforms the given `Vector2`, `Rect2`, or `PoolVector2Array` by this transform. */
+		/** Transforms the given `Vector2`, `Rect2`, or `PackedVector2Array` by this transform. */
 		xform<T extends Vector2 | Rect2 >(v: T) : T;
 
-		/** Inverse-transforms the given `Vector2`, `Rect2`, or `PoolVector2Array` by this transform. */
+		/** Inverse-transforms the given `Vector2`, `Rect2`, or `PackedVector2Array` by this transform. */
 		xform_inv<T extends Vector2 | Rect2 >(v: T) : T;
 
 	}
@@ -2152,10 +2152,10 @@ declare module godot {
 	 An `Array` specifically designed to hold `Vector2`. Optimized for memory usage, does not fragment the memory.
 
 	 **Note:** This type is passed by value and not by reference. */
-	class PoolVector2Array {
+	class PackedVector2Array {
 
 		constructor(source?: Vector2[]);
-		constructor(from: PoolVector2Array);
+		constructor(from: PackedVector2Array);
 		constructor(from: ArrayBuffer);
 		constructor(from: DataView);
 		[Symbol.iterator](): IterableIterator<Vector2>;
@@ -2163,8 +2163,8 @@ declare module godot {
 		/** Appends an element at the end of the array (alias of `push_back`). */
 		append(vector2: Vector2) : void;
 
-		/** Appends a `PoolVector2Array` at the end of this array. */
-		append_array(array: PoolVector2Array) : void;
+		/** Appends a `PackedVector2Array` at the end of this array. */
+		append_array(array: PackedVector2Array) : void;
 
 		/** Returns `true` if the array is empty. */
 		empty() : boolean;
@@ -2201,10 +2201,10 @@ declare module godot {
 	 An `Array` specifically designed to hold `Vector3`. Optimized for memory usage, does not fragment the memory.
 
 	 **Note:** This type is passed by value and not by reference. */
-	class PoolVector3Array {
+	class PackedVector3Array {
 
 		constructor(source?: Vector3[]);
-		constructor(from: PoolVector3Array);
+		constructor(from: PackedVector3Array);
 		constructor(from: ArrayBuffer);
 		constructor(from: DataView);
 		[Symbol.iterator](): IterableIterator<Vector3>;
@@ -2212,8 +2212,8 @@ declare module godot {
 		/** Appends an element at the end of the array (alias of `push_back`). */
 		append(vector3: Vector3) : void;
 
-		/** Appends a `PoolVector3Array` at the end of this array. */
-		append_array(array: PoolVector3Array) : void;
+		/** Appends a `PackedVector3Array` at the end of this array. */
+		append_array(array: PackedVector3Array) : void;
 
 		/** Returns `true` if the array is empty. */
 		empty() : boolean;

@@ -3,9 +3,12 @@
 
 #include "core/io/resource_loader.h"
 #include "core/io/resource_saver.h"
-#include "core/script_language.h"
+#include "core/object/script_language.h"
+#include "core/templates/rb_set.h"
+#include "core/variant/variant.h"
 #include "ecmascript_binder.h"
 #include "scene/resources/text_file.h"
+
 
 #define EXT_JSCLASS "jsx"
 #define EXT_JSCLASS_BYTECODE EXT_JSCLASS "b"
@@ -23,7 +26,7 @@ private:
 	friend class QuickJSBinder;
 	friend class ResourceFormatLoaderECMAScript;
 
-	Set<Object *> instances;
+	HashSet<Object *> instances;
 	StringName class_name;
 	String code;
 	String script_path;
@@ -32,7 +35,7 @@ private:
 	const BasicECMAClassInfo *ecma_class;
 
 #ifdef TOOLS_ENABLED
-	Set<PlaceHolderScriptInstance *> placeholders;
+	HashSet<PlaceHolderScriptInstance *> placeholders;
 	virtual void _placeholder_erased(PlaceHolderScriptInstance *p_placeholder);
 #endif
 
@@ -41,7 +44,7 @@ protected:
 	static void _bind_methods();
 
 public:
-	virtual bool can_instance() const;
+	virtual bool can_instantiate() const override;
 
 	virtual bool inherits_script(const Ref<Script> &p_script) const { return false; }
 	virtual Ref<Script> get_base_script() const { return NULL; } //for script inheritance
@@ -75,8 +78,15 @@ public:
 	virtual void update_exports(); //editor tool
 
 	/* TODO */ virtual int get_member_line(const StringName &p_member) const { return -1; }
-	/* TODO */ virtual void get_constants(Map<StringName, Variant> *p_constants) {}
-	/* TODO */ virtual void get_members(Set<StringName> *p_constants) {}
+	/* TODO */ virtual void get_constants(HashMap<StringName, Variant> *p_constants) {}
+	/* TODO */ virtual void get_members(HashSet<StringName> *p_constants) {}
+
+	virtual Vector<DocData::ClassDoc> get_documentation() const override {
+		return Vector<DocData::ClassDoc>();
+	}
+	virtual const Variant get_rpc_config() const override {
+		return Variant();
+	}
 
 	virtual ScriptLanguage *get_language() const;
 
@@ -90,7 +100,7 @@ public:
 class ResourceFormatLoaderECMAScript : public ResourceFormatLoader {
 	GDCLASS(ResourceFormatLoaderECMAScript, ResourceFormatLoader)
 public:
-	virtual RES load(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
+	virtual Ref<Variant> load(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
 	virtual void get_recognized_extensions(List<String> *p_extensions) const;
 	virtual void get_recognized_extensions_for_type(const String &p_type, List<String> *p_extensions) const;
 	virtual bool handles_type(const String &p_type) const;
@@ -100,9 +110,9 @@ public:
 class ResourceFormatSaverECMAScript : public ResourceFormatSaver {
 	GDCLASS(ResourceFormatSaverECMAScript, ResourceFormatSaver)
 public:
-	virtual Error save(const String &p_path, const RES &p_resource, uint32_t p_flags = 0);
-	virtual void get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const;
-	virtual bool recognize(const RES &p_resource) const;
+	virtual Error save(const String &p_path, const Ref<Variant> p_resource, uint32_t p_flags = 0);
+	virtual void get_recognized_extensions(const Ref<Variant> &p_resource, List<String> *p_extensions) const;
+	virtual bool recognize(const Ref<Variant> &p_resource) const;
 };
 
 class ECMAScriptModule : public TextFile {
@@ -125,21 +135,21 @@ public:
 class ResourceFormatLoaderECMAScriptModule : public ResourceFormatLoader {
 	GDCLASS(ResourceFormatLoaderECMAScriptModule, ResourceFormatLoader)
 public:
-	virtual RES load(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
+	virtual Ref<Variant> load(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
 	virtual void get_recognized_extensions(List<String> *p_extensions) const;
 	virtual void get_recognized_extensions_for_type(const String &p_type, List<String> *p_extensions) const;
 	virtual bool handles_type(const String &p_type) const;
 	virtual String get_resource_type(const String &p_path) const;
 
-	static RES load_static(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
+	static Ref<Variant> load_static(const String &p_path, const String &p_original_path = "", Error *r_error = NULL);
 };
 
 class ResourceFormatSaverECMAScriptModule : public ResourceFormatSaver {
 	GDCLASS(ResourceFormatSaverECMAScriptModule, ResourceFormatSaver)
 public:
-	virtual Error save(const String &p_path, const RES &p_resource, uint32_t p_flags = 0);
-	virtual void get_recognized_extensions(const RES &p_resource, List<String> *p_extensions) const;
-	virtual bool recognize(const RES &p_resource) const;
+	virtual Error save(const String &p_path, const Ref<Variant> &p_resource, uint32_t p_flags = 0);
+	virtual void get_recognized_extensions(const Ref<Variant> &p_resource, List<String> *p_extensions) const;
+	virtual bool recognize(const Ref<Variant> &p_resource) const;
 };
 
 #endif // ECMASCRIPT_H

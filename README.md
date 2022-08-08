@@ -6,17 +6,17 @@ This module implements JavaScript/TypeScript language support for the godot game
 
 ### Features
 - Almost complete ES2020 support
-- All godot api avaliable
+- All Godot Engine api avaliable
 - Operator overriding for builtin types (Vector3, Color, etc)
 - TypeScript support 
-- [Using thirdpart libraries from npm](https://github.com/GodotExplorer/ECMAScriptDemos/tree/master/npm_module)
+- [Using thirdparty libraries from npm](https://github.com/GodotExplorer/ECMAScriptDemos/tree/master/npm_module)
 - Multi-thread support with Worker API
 - Full code completion support for all godot APIs including signals and enumerations
 - Debug in Visual Studio Code with the [plugin](https://marketplace.visualstudio.com/items?itemName=geequlim.godot-javascript-debug)
 
 ### Download
 You can try the pre-compiled binaries from the [release page](https://github.com/GodotExplorer/ECMAScript/releases)  
-You can also get the binaries with lastest commits from the [github build action result](https://github.com/GodotExplorer/ECMAScript/actions)
+You can also get the binaries with latest commits from the [github build action result](https://github.com/GodotExplorer/ECMAScript/actions)
 
 ### Compilation
 * Clone the source code of [godot](https://github.com/godotengine/godot)
@@ -70,7 +70,7 @@ export default class MySprite extends godot.Sprite {
 godot.register_property(MySprite, 'direction', new godot.Vector2(1, 0));
 ```
 
-There are 2 ways of using the `godot.register_property`, the thrid param can either be
+There are 2 ways of using the `godot.register_property`, the third param can either be
 a default value for the property you're trying to export or an object giving a more detailed
 description on how the editor should show it.
 
